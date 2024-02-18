@@ -8,8 +8,8 @@ import {
   signInWithPopup,
   onAuthStateChanged,
 } from "firebase/auth";
-import { addDoc, collection, getFirestore } from "firebase/firestore";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+import { addDoc, collection, getDocs, getFirestore } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 const FirebaseContext = createContext();
 const firebaseConfig = {
   apiKey: "AIzaSyCXQe6bbMw9vAWD77FvBbgGVMgps7AuVo8",
@@ -25,6 +25,7 @@ const firebaseAuth = getAuth(firebaseApp);
 const goggleProvider = new GoogleAuthProvider();
 const fireStore = getFirestore(firebaseApp);
 const storage = getStorage(firebaseApp);
+
 export const useFirebase = () => useContext(FirebaseContext);
 
 export const ContextProvider = (props) => {
@@ -65,7 +66,12 @@ export const ContextProvider = (props) => {
   });
 
   const isLoggedIn = user ? true : false;
-
+  //get Data function
+  const getData = () => getDocs(collection(fireStore, "books"));
+  // get image url
+  const getImageURL = (path) => {
+    return getDownloadURL(ref(storage, path));
+  };
   return (
     <FirebaseContext.Provider
       value={{
@@ -74,6 +80,8 @@ export const ContextProvider = (props) => {
         signinWithGoggle,
         addDocumentInFirestore,
         isLoggedIn,
+        getData,
+        getImageURL,
       }}
     >
       {props.children}
